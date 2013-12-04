@@ -23,15 +23,13 @@ void Chromosome::ChangeGeneAtIndex(unsigned int index, const Gene& gene) {
 }
 
 void Chromosome::MutateGene() {
-	int geneIndex = rand() % _genes.size();
-	std::vector<Drone> drones = DataRepository::getInstance().getDrones();
-	int randomNumber = rand() % drones.size();
-	Gene *gene = &(*(_genes.begin() + geneIndex));
-	gene->setDrone(drones.at(randomNumber));
+	int gene_index = rand() % _genes.size();
+	int drone_index = rand() % DataRepository::getInstance().getDronesCount();
+	_genes[gene_index].setDrone(*DataRepository::getInstance().getDroneAtIndex(drone_index));
 }
 
-Gene Chromosome::getGeneAtIndex(const unsigned int index) const {
-	return _genes.at(index);
+Gene* Chromosome::getGeneAtIndex(unsigned int index) {
+	return &_genes[index];
 }
 
 unsigned int Chromosome::getSize() const {

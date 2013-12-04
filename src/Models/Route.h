@@ -12,11 +12,12 @@
 
 class Route {
 public:
-	Route(const Chromosome& chromosome, const Drone& drone);
+	Route(Chromosome& chromosome, const Drone& drone);
 	virtual ~Route() { };
 
 	float getRouteDistance();
 	float getFlightTime();
+	Drone* getDrone();
 	std::vector<Coordinates> getCoordinates();
 
 private:
@@ -25,6 +26,7 @@ private:
 private:
 	std::vector<Coordinates> _coordinates;
 	Drone _drone;
+	float _distance;
 };
 
 #endif /* ROUTE_H_ */

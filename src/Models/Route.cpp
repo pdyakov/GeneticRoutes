@@ -8,7 +8,7 @@
 #include "Route.h"
 #include "math.h"
 
-Route::Route(const Chromosome& chromosome, const Drone& drone) {
+Route::Route(Chromosome& chromosome, const Drone& drone) {
 	_drone = drone;
 
 	// Initialise route with current drone position
@@ -16,24 +16,28 @@ Route::Route(const Chromosome& chromosome, const Drone& drone) {
 
 	// Add targets to route
 	for (unsigned int i = 0; i < chromosome.getSize(); i++) {
-		Gene gene = chromosome.getGeneAtIndex(i);
-		if (gene.getDrone().getDroneName() == drone.getDroneName()) {
-			_coordinates.push_back(gene.getTarget().getTargetPosition());
+		Gene* gene = chromosome.getGeneAtIndex(i);
+		if (gene->getDrone()->getDroneId() == drone.getDroneId()) {
+			_coordinates.push_back(gene->getTarget()->getTargetPosition());
 		}
 	}
 
 	// Add base position as final route point
 	_coordinates.push_back(drone.getFlightBase().getBasePosition());
+
+	_distance = 0;
+
+	for (unsigned int i = 0; i < _coordinates.size() - 1; i++) {
+		_distance += distanceBetweenPoints(_coordinates[i], _coordinates[i + 1]);
+	}
+}
+
+Drone* Route::getDrone() {
+	return &_drone;
 }
 
 float Route::getRouteDistance() {
-	float result = 0;
-
-	for (unsigned int i = 0; i < _coordinates.size() - 1; i++) {
-		result += distanceBetweenPoints(_coordinates.at(i), _coordinates.at(i + 1));
-	}
-
-	return result;
+	return _distance;
 }
 
 float Route::getFlightTime() {

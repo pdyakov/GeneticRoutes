@@ -43,6 +43,30 @@ Target *DataRepository::getTargetById(const int id) const {
 	return NULL;
 }
 
+Drone *DataRepository::getDroneAtIndex(const unsigned int index) {
+	return (index < _drones.size()) ? &_drones[index] : NULL;
+}
+
+FlightBase *DataRepository::getBaseAtIndex(const unsigned int index) {
+	return (index < _bases.size()) ? &_bases[index] : NULL;
+}
+
+Target *DataRepository::getTargetAtIndex(const unsigned int index) {
+	return (index < _targets.size()) ? &_targets[index] : NULL;
+}
+
+unsigned int DataRepository::getDronesCount() const {
+	return _drones.size();
+}
+
+unsigned int DataRepository::getBasesCount() const {
+	return _bases.size();
+}
+
+unsigned int DataRepository::getTargetsCount() const {
+	return _targets.size();
+}
+
 std::vector<Drone> DataRepository::getDrones() const {
 	return _drones;
 }

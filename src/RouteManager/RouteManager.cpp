@@ -27,8 +27,9 @@ std::vector<Route> RouteManager::calculateBestRoutes(const std::vector<Target>& 
 	// make selection
 	selection(_populations.back());
 
+	int iteration_count = 0;
 	// start algorithm
-	while(!routesResolved(_populations.back())) {
+	while(!routesResolved(_populations.back()) && iteration_count < Constants::getPopulationCount()) {
 
 		nextGeneration(_populations.back());
 
@@ -36,13 +37,20 @@ std::vector<Route> RouteManager::calculateBestRoutes(const std::vector<Target>& 
 
 		selection(_populations.back());
 
+		iteration_count++;
 	}
 
 	Population resultPopulation = _populations.back();
 
-
+	int bestNumber = 0;
+	float bestSuit = resultPopulation.getChromosomeAtIndex(0)->getSuitability();
+	for (unsigned int i = 0; i < resultPopulation.getSize(); i++) {
+		if (resultPopulation.getChromosomeAtIndex(i)->getSuitability() > bestSuit) {
+			bestNumber = i;
+		}
+	}
 	for (unsigned int i = 0; i < drones.size(); i++) {
-		results.push_back(Route(*resultPopulation.getChromosomeAtIndex(0), drones.at(i)));
+		results.push_back(Route(*resultPopulation.getChromosomeAtIndex(bestNumber), drones.at(i)));
 	}
 
 	return results;
@@ -50,15 +58,12 @@ std::vector<Route> RouteManager::calculateBestRoutes(const std::vector<Target>& 
 
 // initial selection. Chromosomes that can't exist are removed.
 void RouteManager::selection(Population& population) {
-
-	std::vector<Drone> drones = DataRepository::getInstance().getDrones();
-
 	for (unsigned int i = 0; i < population.getSize(); i++) {
-		for (unsigned int j = 0; j < drones.size(); j++) {
-			Drone drone = drones.at(j);
-			Route route = Route(*population.getChromosomeAtIndex(i), drone);
-			float routeDistance = route.getRouteDistance();
-			if ((routeDistance / drone.getDroneSpeed()) > drone.getRemainingFlightTime()) {
+		for (unsigned int j = 0; j < DataRepository::getInstance().getDronesCount(); j++) {
+			Drone *drone = DataRepository::getInstance().getDroneAtIndex(j);
+			Route route = Route(*population.getChromosomeAtIndex(i), *drone);
+			float route_distance = route.getRouteDistance();
+			if ((route_distance / drone->getDroneSpeed()) > drone->getRemainingFlightTime()) {
 				population.removeChromosomeAtIndex(i);
 				break;
 			}
@@ -68,31 +73,32 @@ void RouteManager::selection(Population& population) {
 
 // calculate suitability for each chromosome. Higher score - better;
 void RouteManager::calculateSuitabilityScoreForPopulation(Population& population) {
-	std::vector<Drone> drones = DataRepository::getInstance().getDrones();
+	float suitability;
+	float suitability_sum;
+	float max_suitability;
+	Drone *drone;
 
 	for (unsigned int i = 0; i < population.getSize(); i++) {
 		Chromosome *chromosome = population.getChromosomeAtIndex(i);
-		float suitability = 0;
-		float suitabilitySum = 0;
+//		suitability_sum = 0;
 
 		// Calculating suitability for first drone
-		Drone drone = drones.at(0);
-		Route route = Route(*chromosome, drone);
-		suitability = route.getRouteDistance() / drone.getDroneSpeed();
-		suitabilitySum += suitability;
-		//Calculating max suitability for chromosome. It will be total flight time.
-		float maxSuit = suitability;
-		for (unsigned int j = 1; j < drones.size(); j++) {
-			Drone drone = drones.at(j);
-			Route route = Route(*chromosome, drone);
-			suitability = route.getRouteDistance() / drone.getDroneSpeed();
-			suitabilitySum += suitability;
-			if (suitability > maxSuit)
-				maxSuit = suitability;
-		}
+		drone = DataRepository::getInstance().getDroneAtIndex(0);
+		Route route = Route(*chromosome, *drone);
+		suitability = route.getRouteDistance() / drone->getDroneSpeed();
+//		suitability_sum += suitability;
 
-		//Set minimal suitability as total suitability for chromosome.
-		chromosome->setSuitability(100 / (suitabilitySum + (maxSuit * 6)));
+		//Calculating max suitability for chromosome. It will be total flight time.
+		max_suitability = suitability;
+		for (unsigned int j = 1; j < DataRepository::getInstance().getDronesCount(); j++) {
+			drone = DataRepository::getInstance().getDroneAtIndex(j);
+			Route route = Route(*chromosome, *drone);
+			suitability = route.getRouteDistance() / drone->getDroneSpeed();
+//			suitability_sum += suitability;
+			if (suitability > max_suitability)
+				max_suitability = suitability;
+		}
+		chromosome->setSuitability((10 / max_suitability));
 	}
 }
 
@@ -115,21 +121,41 @@ bool RouteManager::routesResolved(Population& population) {
 
 // Calculate next population.
 void RouteManager::nextGeneration(Population& population) {
-	float suitSum = population.getSuitabilitySum();
+	float suitability_sum = population.getSuitabilitySum();
 	float chanses[population.getSize() + 1];
 
-	// calculate chances to be a parent.
+	// calculate chances to be a parent and find best one.
 	chanses[0] = 0;
+	int best_index = 0;
+	float best_suitability = population.getChromosomeAtIndex(0)->getSuitability();
+
 	for (unsigned int i = 0; i < population.getSize(); i++) {
-		chanses[i + 1] = ((population.getChromosomeAtIndex(i)->getSuitability() * 100.0) / suitSum) + chanses[i];
+		float local_suitability = population.getChromosomeAtIndex(i)->getSuitability();
+		if (local_suitability > best_suitability) {
+			best_index = i;
+			best_suitability = local_suitability;
+		}
+		chanses[i + 1] = ((local_suitability * 100.0) / suitability_sum) + chanses[i];
 	}
 	chanses[population.getSize()] = 100; // max chance must be int and exactly 100
 
+	Chromosome best_chromosome = *population.getChromosomeAtIndex(best_index);
+	population.removeChromosomeAtIndex(best_index);
+	int numberOfClones =
+			Constants::getPopulationCount() -
+			(Constants::getPopulationCount() *
+					((suitability_sum / (float)Constants::getPopulationCount())
+							/ best_suitability));
+
+	if (numberOfClones > (Constants::getPopulationCount() / 2)) {
+		numberOfClones = Constants::getPopulationCount() / 2;
+	}
+
 	// Generate family population.
 	Population familyPopulation = Population();
-
-	for (int i = 0; i < Constants::getPopulationCount(); i++) {
+	for (int i = 0; i < Constants::getPopulationCount() - numberOfClones; i++) {
 		int chance = rand() % 100 + 1;
+
 		for (unsigned int j = 0; j < population.getSize(); j++) {
 			if (chance > chanses[j] && chance <= chanses[j + 1]) {
 				familyPopulation.setChromosome(*population.getChromosomeAtIndex(j));
@@ -139,6 +165,13 @@ void RouteManager::nextGeneration(Population& population) {
 	}
 
 	Population nextPopulation = crossing(familyPopulation);
+
+	//clones
+
+	std::cout << best_chromosome.getSuitability() << std::endl;
+	for (int i = nextPopulation.getSize(); i < Constants::getPopulationCount(); i++) {
+		nextPopulation.setChromosome(best_chromosome);
+	}
 	_populations.push_back(nextPopulation);
 }
 
@@ -156,18 +189,24 @@ Population RouteManager::crossing(Population& population) {
 		randomNumber = rand() % (chromosome1.getSize() - 1) + 1;
 
 		for (int i = 0; i < randomNumber; i++) {
-			Gene tGene = chromosome1.getGeneAtIndex(i);
-			chromosome1.ChangeGeneAtIndex(i, chromosome2.getGeneAtIndex(i));
-			chromosome2.ChangeGeneAtIndex(i, tGene);
+			Gene temp = *chromosome1.getGeneAtIndex(i);
+			chromosome1.ChangeGeneAtIndex(i, *chromosome2.getGeneAtIndex(i));
+			chromosome2.ChangeGeneAtIndex(i, temp);
 		}
 
-		int mutateChance = rand() % 500 + 1;
+		int mutateChance = rand() % 100 + 1;
 
 		if (mutateChance == 8) {
 			chromosome1.MutateGene();
 		}
 
+		if (mutateChance == 46) {
+			chromosome1.MutateGene();
+		}
 
+		if (mutateChance == 16) {
+			chromosome2.MutateGene();
+		}
 
 		nextPopulation.setChromosome(chromosome1);
 		nextPopulation.setChromosome(chromosome2);

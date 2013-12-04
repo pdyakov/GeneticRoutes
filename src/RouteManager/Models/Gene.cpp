@@ -10,12 +10,12 @@
 Gene::Gene(const Target& target, const Drone& drone) : _target(target), _drone(drone) {
 }
 
-Drone Gene::getDrone() const {
-	return _drone;
+Drone* Gene::getDrone() {
+	return &_drone;
 }
 
-Target Gene::getTarget() const {
-	return _target;
+Target* Gene::getTarget() {
+	return &_target;
 }
 
 void Gene::setDrone(const Drone& drone) {

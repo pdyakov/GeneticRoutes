@@ -17,8 +17,8 @@ public:
 	Gene(const Target& target, const Drone& drone);
 	virtual ~Gene() { };
 
-	Drone getDrone() const;
-	Target getTarget() const;
+	Drone* getDrone();
+	Target* getTarget();
 
 	void setDrone(const Drone& drone);
 	void setTarget(const Target& target);

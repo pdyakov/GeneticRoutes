@@ -21,6 +21,14 @@ public:
 	FlightBase *getBaseById(const int id) const;
 	Target *getTargetById(const int id) const;
 
+	Drone *getDroneAtIndex(const unsigned int index);
+	FlightBase *getBaseAtIndex(const unsigned int index);
+	Target *getTargetAtIndex(const unsigned int index);
+
+	unsigned int getDronesCount() const;
+	unsigned int getBasesCount() const;
+	unsigned int getTargetsCount() const;
+
 	std::vector<Drone> getDrones() const;
 	std::vector<FlightBase> getBases() const;
 	std::vector<Target> getTargets() const;

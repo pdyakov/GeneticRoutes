@@ -16,7 +16,7 @@ public:
 	Chromosome();
 	virtual ~Chromosome() { };
 
-	Gene getGeneAtIndex(const unsigned int index) const;
+	Gene* getGeneAtIndex(unsigned int index);
 
 	void AddGene(const Gene& gene);
 	void ChangeGeneAtIndex(unsigned int index, const Gene& replacementGene);

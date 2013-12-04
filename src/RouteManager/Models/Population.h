@@ -23,6 +23,7 @@ public:
 	void removeChromosomeAtIndex(const unsigned int index);
 	unsigned int getSize() const;
 	float getSuitabilitySum() const;
+	void sort();
 
 private:
 	std::vector<Chromosome> _chromosomes;
