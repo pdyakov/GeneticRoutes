@@ -12,6 +12,7 @@
 
 class Target {
 public:
+    Target(){}
 	Target(const Coordinates& coordinates);
 	virtual ~Target() { };
 

@@ -29,7 +29,7 @@ float Drone::getDroneSpeed() const {
 }
 
 float Drone::getRemainingFlightTime() const {
-	return 3.0;
+    return _flightTime;
 }
 
 std::string Drone::getDroneName() const {
@@ -51,6 +51,3 @@ void Drone::setDroneId(int id) {
 void Drone::setDroneName(std::string name) {
 	_name = name;
 }
-
-
-

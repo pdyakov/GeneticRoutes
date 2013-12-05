@@ -10,7 +10,7 @@
 #include "RouteManager/RouteManager.h"
 using namespace std;
 
-int main() {
+int NOTmain() {
 
 	// Set flight bases. Drones always start and end at this point.
 	FlightBase base1 = FlightBase("base1", Coordinates(19, 3));

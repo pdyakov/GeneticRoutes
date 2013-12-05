@@ -10,12 +10,13 @@
 #include "../DataAccess/Constants.h"
 #include <stdlib.h>
 #include <algorithm>
+#include <ctime>
 
 std::vector<Route> RouteManager::calculateBestRoutes(const std::vector<Target>& targets) {
 
 	std::vector<Drone> drones = DataRepository::getInstance().getDrones();
 	std::vector<Route> results;
-	srand(time(NULL));
+    srand(time(NULL));
 
 	// generate first population
 	Population firstPopulation = Population(targets, drones);
@@ -168,7 +169,6 @@ void RouteManager::nextGeneration(Population& population) {
 
 	//clones
 
-	std::cout << best_chromosome.getSuitability() << std::endl;
 	for (int i = nextPopulation.getSize(); i < Constants::getPopulationCount(); i++) {
 		nextPopulation.setChromosome(best_chromosome);
 	}

@@ -22,5 +22,3 @@ int Target::getTargetId() const {
 void Target::setTargetId(int id) {
 	_id = id;
 }
-
-
