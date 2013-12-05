@@ -1,4 +1,6 @@
 #include <QMutableVectorIterator>
+#include <QPainter>
+#include <QPolygon>
 #include <iostream>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -13,13 +15,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 //    __drones = new QStandardItemModel(0, 4, this);
 
-
     __flightBases = new QVector<FlightBase>;
     __targets = new QVector<Target>;
     __drones = new QVector<Drone>;
 
 
-
+    drFlag = false;
 
     Target target1 = Target(Coordinates(4, 11));
     Target target2 = Target(Coordinates(10, 7));
@@ -121,5 +122,96 @@ void MainWindow::on_pushButton_clicked()
 
     // Resolve routes.
     RouteManager manager = RouteManager();
-    QVector<Route> routes = QVector<Route>::fromStdVector(manager.calculateBestRoutes(DataRepository::getInstance().getTargets()));
+
+    __routes = new QVector<Route>;
+   *__routes = QVector<Route>::fromStdVector(manager.calculateBestRoutes(DataRepository::getInstance().getTargets()));
+    drFlag = true;
+    this->update();
+    pixmap = new QPixmap(300, 400);
+
+
+    QPainter qp(pixmap);
+    if (drFlag)
+    {
+        QPen pen(Qt::black, 2, Qt::SolidLine);
+
+        QPolygon routes;
+        for(int i = 0; i < __routes->count(); i++)
+        {
+            QString str = "Route - " + QString::number(i + 1);
+            ui->textBrowser->append(str);
+            if (i == 0)
+            {
+                pen.setColor(Qt::magenta);
+            }
+            if (i == 1)
+            {
+                pen.setColor(Qt::green);
+            }
+            if (i ==2 )
+            {
+                pen.setColor(Qt::red);
+            }
+            switch (i) {
+            case 0:
+                pen.setColor(Qt::magenta);
+                break;
+            case 1:
+                pen.setColor(Qt::green);
+                break;
+            case 2:
+                pen.setColor(Qt::cyan);
+                break;
+            case 3:
+                pen.setColor(Qt::white);
+                break;
+            case 4:
+                pen.setColor(Qt::darkYellow);
+                break;
+            case 5:
+                pen.setColor(Qt::gray);
+                break;
+            default:
+                break;
+            }
+
+            Route megaRoute = __routes->at(i);
+            QVector<Coordinates> coords = QVector<Coordinates>::fromStdVector(megaRoute.getCoordinates());
+            for(int j = 0; j < coords.count(); j++)
+            {
+                routes.append(QPoint(coords.at(j).getPointX()*10, coords.at(j).getPointY()*10));
+                QString string = QString::number(coords.at(j).getPointX()) + " - " + QString::number(coords.at(j).getPointY());
+                ui->textBrowser->append(string);
+            }
+
+            qp.setPen(pen);
+            qp.drawPolyline(routes);
+            routes.clear();
+        }
+        pen.setColor(Qt::yellow);
+        qp.setPen(pen);
+        QPolygon basesPoly;
+
+        for(int i = 0; i < __flightBases->count(); i++)
+        {
+            QPoint pnt(__flightBases->at(i).getBasePosition().getPointX()*10,__flightBases->at(i).getBasePosition().getPointY()*10);
+            qp.drawPoint(pnt);
+            qp.drawPoint(pnt.x()+1, pnt.y()+1);
+            qp.drawPoint(pnt.x()+1, pnt.y()-1);
+            qp.drawPoint(pnt.x()-1, pnt.y()+1);
+            qp.drawPoint(pnt.x()-1, pnt.y()-1);
+//            basesPoly.append(QPoint(__flightBases->at(i).getBasePosition().getPointX()*10,__flightBases->at(i).getBasePosition().getPointY()*10));
+        }
+        drFlag = false;
+    }
+}
+
+void MainWindow::paintEvent(QPaintEvent *)
+{
+    if (pixmap != NULL)
+    {
+        QPainter painter(this);
+        painter.drawPixmap(0, 0, *pixmap);
+    }
+
 }

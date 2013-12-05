@@ -37,6 +37,9 @@ private:
     QVector<Drone> *__drones;
     QVector<Target> *__targets;
     QVector<FlightBase> *__flightBases;
+    QVector<Route> *__routes;
+    bool drFlag;
+    QPixmap *pixmap;
 
 //    QStandardItemModel** __drones;
 //    QStandardItemModel* __targets;
@@ -46,6 +49,7 @@ private:
 
     void addTarget(QStandardItemModel *targets, const QString &name, const float x, const float y);
     void addDrone(QStandardItemModel *drones, const QString &name, const float x, const float y);
+    void paintEvent(QPaintEvent *);
 };
 
 #endif // MAINWINDOW_H
