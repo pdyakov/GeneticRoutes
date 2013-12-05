@@ -12,6 +12,7 @@
 
 class Route {
 public:
+    Route(){}
 	Route(Chromosome& chromosome, const Drone& drone);
 	virtual ~Route() { };
 

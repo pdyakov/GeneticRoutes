@@ -31,6 +31,8 @@ private slots:
 
     void on_action_6_triggered();
 
+    void on_pushButton_clicked();
+
 private:
     QVector<Drone> *__drones;
     QVector<Target> *__targets;
