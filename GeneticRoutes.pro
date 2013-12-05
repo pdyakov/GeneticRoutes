@@ -29,7 +29,8 @@ SOURCES += main.cpp\
     src/Utils/TargetCoordinator.cpp \
     basesdialog.cpp \
     targetsdialog.cpp \
-    dronesdialog.cpp
+    dronesdialog.cpp \
+    aboutdialog.cpp
 
 HEADERS  += mainwindow.h \
     src/DataAccess/DataRepository.h \
@@ -46,9 +47,11 @@ HEADERS  += mainwindow.h \
     src/Utils/TargetCoordinator.h \
     basesdialog.h \
     targetsdialog.h \
-    dronesdialog.h
+    dronesdialog.h \
+    aboutdialog.h
 
 FORMS    += mainwindow.ui \
     basesdialog.ui \
     targetsdialog.ui \
-    dronesdialog.ui
+    dronesdialog.ui \
+    aboutdialog.ui

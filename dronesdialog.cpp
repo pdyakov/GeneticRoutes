@@ -1,9 +1,9 @@
 #include "dronesdialog.h"
 #include "ui_dronesdialog.h"
 
-dronesDialog::dronesDialog(QWidget *parent) :
+DronesDialog::DronesDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::dronesDialog)
+    ui(new Ui::DronesDialog)
 {
     ui->setupUi(this);
     __dronesModel = new QStandardItemModel(0, 4, this);
@@ -19,12 +19,12 @@ dronesDialog::dronesDialog(QWidget *parent) :
     ui->treeView->setModel(__dronesModel);
 }
 
-dronesDialog::~dronesDialog()
+DronesDialog::~DronesDialog()
 {
     delete ui;
 }
 
-void dronesDialog::setData(QVector<FlightBase> *flightBases, QVector<Drone> *drones)
+void DronesDialog::setData(QVector<FlightBase> *flightBases, QVector<Drone> *drones)
 {
     __flightBases = flightBases;
     __drones = drones;
@@ -59,7 +59,7 @@ void dronesDialog::setData(QVector<FlightBase> *flightBases, QVector<Drone> *dro
     }
 }
 
-void dronesDialog::on_okButton_clicked()
+void DronesDialog::on_okButton_clicked()
 {
     __drones->clear();
     for(int i = 0; i < __dronesModel->rowCount(); i++ )
@@ -76,13 +76,13 @@ void dronesDialog::on_okButton_clicked()
     this->close();
 }
 
-void dronesDialog::on_minusButton_clicked()
+void DronesDialog::on_minusButton_clicked()
 {
     QModelIndex list = ui->treeView->currentIndex();
     __dronesModel->removeRow(list.row());
 }
 
-void dronesDialog::on_plusButton_clicked()
+void DronesDialog::on_plusButton_clicked()
 {
     __dronesModel->insertRow(__dronesModel->rowCount());
     __dronesModel->setData(__dronesModel->index(__dronesModel->rowCount()-1, 0), "Name");

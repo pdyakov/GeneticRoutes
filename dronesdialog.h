@@ -5,16 +5,16 @@
 #include <QStandardItemModel>
 #include "src/DataAccess/DataRepository.h"
 namespace Ui {
-class dronesDialog;
+class DronesDialog;
 }
 
-class dronesDialog : public QDialog
+class DronesDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit dronesDialog(QWidget *parent = 0);
-    ~dronesDialog();
+    explicit DronesDialog(QWidget *parent = 0);
+    ~DronesDialog();
     void setData(QVector<FlightBase> *flightBases, QVector<Drone> *drones);
 
 private slots:
@@ -25,7 +25,7 @@ private slots:
     void on_plusButton_clicked();
 
 private:
-    Ui::dronesDialog *ui;
+    Ui::DronesDialog *ui;
 
     QVector<FlightBase> *__flightBases;
     QVector<Drone> *__drones;

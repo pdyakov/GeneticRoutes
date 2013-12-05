@@ -127,4 +127,11 @@ void DataRepository::updateTarget(Target& target) {
 		}
 }
 
+void DataRepository::clearAll()
+{
+    _bases.clear();
+    _drones.clear();
+    _targets.clear();
+}
+
 

@@ -3,9 +3,9 @@
 #include "ui_basesdialog.h"
 
 
-basesDialog::basesDialog(QWidget *parent) :
+BasesDialog::BasesDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::basesDialog)
+    ui(new Ui::BasesDialog)
 {
 
 
@@ -23,12 +23,12 @@ basesDialog::basesDialog(QWidget *parent) :
     ui->treeView->setModel(__flightBasesList);
 }
 
-basesDialog::~basesDialog()
+BasesDialog::~BasesDialog()
 {
     delete ui;
 }
 
-void basesDialog::setBases(QVector<FlightBase> *bases)
+void BasesDialog::setBases(QVector<FlightBase> *bases)
 {
     __flightBases = bases;
     for(int i = __flightBases->count()-1; i >= 0; i--)
@@ -43,7 +43,7 @@ void basesDialog::setBases(QVector<FlightBase> *bases)
 }
 
 
-void basesDialog::addBase(QStandardItemModel *bases, const QString &name, const float x, const float y)
+void BasesDialog::addBase(QStandardItemModel *bases, const QString &name, const float x, const float y)
 {
     bases->insertRow(0);
     bases->setData(bases->index(0, 0), name);
@@ -51,7 +51,7 @@ void basesDialog::addBase(QStandardItemModel *bases, const QString &name, const 
     bases->setData(bases->index(0, 2), y);
 }
 
-void basesDialog::on_plusButton_clicked()
+void BasesDialog::on_plusButton_clicked()
 {
     __flightBasesList->insertRow(__flightBasesList->rowCount());
     __flightBasesList->setData(__flightBasesList->index(__flightBasesList->rowCount()-1, 0), "Name");
@@ -59,13 +59,13 @@ void basesDialog::on_plusButton_clicked()
     __flightBasesList->setData(__flightBasesList->index(__flightBasesList->rowCount()-1, 2), 0);
 }
 
-void basesDialog::on_minusButton_clicked()
+void BasesDialog::on_minusButton_clicked()
 {
     QModelIndex list = ui->treeView->currentIndex();
     __flightBasesList->removeRow(list.row());
 }
 
-void basesDialog::on_okbutton_clicked()
+void BasesDialog::on_okbutton_clicked()
 {
     __flightBases->clear();
     for(int i = 0; i < __flightBasesList->rowCount(); i++ )

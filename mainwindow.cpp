@@ -1,7 +1,9 @@
+#include <iostream>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "targetsdialog.h"
 #include "dronesdialog.h"
+#include "aboutdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -67,24 +69,57 @@ void MainWindow::on_action_4_triggered()
 
 void MainWindow::on_action_triggered()
 {
-    basesDialog diallog;
-    diallog.setBases(__flightBases);
-    diallog.exec();
+    BasesDialog dialog;
+    dialog.setBases(__flightBases);
+    dialog.exec();
 }
 
 
 
 void MainWindow::on_action_2_triggered()
 {
-    dronesDialog diallog;
-    diallog.setData(__flightBases, __drones);
-    diallog.exec();
+    DronesDialog dialog;
+    dialog.setData(__flightBases, __drones);
+    dialog.exec();
 
 }
 
 void MainWindow::on_action_3_triggered()
 {
-    targetsDialog diallog;
-    diallog.setTargets(__targets);
-    diallog.exec();
+    TargetsDialog dialog;
+    dialog.setTargets(__targets);
+    dialog.exec();
+}
+
+void MainWindow::on_action_6_triggered()
+{
+    AboutDialog dialog;
+    dialog.exec();
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    DataRepository::getInstance().clearAll();
+    QVectorIterator<FlightBase> baseIterator(__flightBases);
+    while(baseIterator.hasNext())
+    {
+        DataRepository::getInstance().insertBase(baseIterator.next());
+    }
+
+    QVectorIterator<Drone> droneIterator(__drones);
+    while(droneIterator.hasNext())
+    {
+        DataRepository::getInstance().insertDrone(droneIterator.next());
+    }
+
+    QVectorIterator<Drone> targerIterator(__targets);
+    while(targerIterator.hasNext())
+    {
+        DataRepository::getInstance().insertDrone(targerIterator.next());
+    }
+
+    // Resolve routes.
+    RouteManager manager = RouteManager();
+    QVector<Route> *routes = new QVector::fromStdVector(manager.calculateBestRoutes(DataRepository::getInstance().getTargets()));
+
 }

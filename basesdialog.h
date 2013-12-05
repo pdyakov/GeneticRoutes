@@ -6,16 +6,16 @@
 #include "src/DataAccess/DataRepository.h"
 
 namespace Ui {
-class basesDialog;
+class BasesDialog;
 }
 
-class basesDialog : public QDialog
+class BasesDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit basesDialog(QWidget *parent = 0);
-    ~basesDialog();
+    explicit BasesDialog(QWidget *parent = 0);
+    ~BasesDialog();
     void setBases(QVector<FlightBase> *bases);
 
 private slots:
@@ -26,7 +26,7 @@ private slots:
     void on_okbutton_clicked();
 
 private:
-    Ui::basesDialog *ui;
+    Ui::BasesDialog *ui;
 
     QVector<FlightBase> *__flightBases;
 

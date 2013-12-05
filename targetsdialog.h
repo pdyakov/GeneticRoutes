@@ -6,16 +6,16 @@
 #include "src/DataAccess/DataRepository.h"
 
 namespace Ui {
-class targetsDialog;
+class TargetsDialog;
 }
 
-class targetsDialog : public QDialog
+class TargetsDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit targetsDialog(QWidget *parent = 0);
-    ~targetsDialog();
+    explicit TargetsDialog(QWidget *parent = 0);
+    ~TargetsDialog();
     void setTargets(QVector<Target> *targets);
 
 private slots:
@@ -26,7 +26,7 @@ private slots:
     void on_okButton_clicked();
 
 private:
-    Ui::targetsDialog *ui;
+    Ui::TargetsDialog *ui;
 
     QVector<Target> *__targets;
 

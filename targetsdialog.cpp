@@ -1,9 +1,9 @@
 #include "targetsdialog.h"
 #include "ui_targetsdialog.h"
 
-targetsDialog::targetsDialog(QWidget *parent) :
+TargetsDialog::TargetsDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::targetsDialog)
+    ui(new Ui::TargetsDialog)
 {
     ui->setupUi(this);
 
@@ -17,19 +17,19 @@ targetsDialog::targetsDialog(QWidget *parent) :
     ui->treeView->setModel(__targetsList);
 }
 
-targetsDialog::~targetsDialog()
+TargetsDialog::~TargetsDialog()
 {
     delete ui;
 }
 
-void targetsDialog::on_minusButton_clicked()
+void TargetsDialog::on_minusButton_clicked()
 {
     QModelIndex list = ui->treeView->currentIndex();
     __targetsList->removeRow(list.row());
     __targets->remove(list.row());
 }
 
-void targetsDialog::on_plusButton_clicked()
+void TargetsDialog::on_plusButton_clicked()
 {
     __targetsList->insertRow(__targetsList->rowCount());
     __targetsList->setData(__targetsList->index(__targetsList->rowCount()-1, 0), 0);
@@ -38,7 +38,7 @@ void targetsDialog::on_plusButton_clicked()
     __targets->append(*target);
 }
 
-void targetsDialog::on_okButton_clicked()
+void TargetsDialog::on_okButton_clicked()
 {
     __targets->clear();
     for(int i = 0; i < __targetsList->rowCount(); i++ )
@@ -54,7 +54,7 @@ void targetsDialog::on_okButton_clicked()
     this->close();
 }
 
-void targetsDialog::setTargets(QVector<Target> *targets)
+void TargetsDialog::setTargets(QVector<Target> *targets)
 {
     __targets = targets;
     for(int i = __targets->count()-1; i >= 0; i--)
@@ -67,7 +67,7 @@ void targetsDialog::setTargets(QVector<Target> *targets)
 
 }
 
-void targetsDialog::addTarget(QStandardItemModel *targets, const float x, const float y)
+void TargetsDialog::addTarget(QStandardItemModel *targets, const float x, const float y)
 {
     targets->insertRow(0);
     targets->setData(targets->index(0, 0), x);

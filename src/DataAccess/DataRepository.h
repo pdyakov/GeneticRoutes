@@ -41,6 +41,8 @@ public:
 	void updateBase(FlightBase& flightBase);
 	void updateTarget(Target& target);
 
+    void clearAll();
+
 private:
 	DataRepository();
 	DataRepository(DataRepository const&);
