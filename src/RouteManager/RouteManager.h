@@ -25,7 +25,7 @@ private:
 	void nextGeneration(Population& population);
 	Population crossing(Population& population);
 private:
-	std::vector<Population> _populations;
+	Population _population;
 };
 
 

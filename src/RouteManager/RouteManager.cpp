@@ -10,48 +10,43 @@
 #include "../DataAccess/Constants.h"
 #include <stdlib.h>
 #include <algorithm>
-#include <ctime>
 
 std::vector<Route> RouteManager::calculateBestRoutes(const std::vector<Target>& targets) {
 
 	std::vector<Drone> drones = DataRepository::getInstance().getDrones();
 	std::vector<Route> results;
-    srand(time(NULL));
+	srand(time(NULL));
 
 	// generate first population
-	Population firstPopulation = Population(targets, drones);
+	_population = Population(targets, drones);
 
-	_populations.push_back(firstPopulation);
-
-	calculateSuitabilityScoreForPopulation(_populations.back());
+	calculateSuitabilityScoreForPopulation(_population);
 
 	// make selection
-	selection(_populations.back());
+	selection(_population);
 
 	int iteration_count = 0;
 	// start algorithm
-	while(!routesResolved(_populations.back()) && iteration_count < Constants::getPopulationCount()) {
+	while(iteration_count < 600) {
 
-		nextGeneration(_populations.back());
+		nextGeneration(_population);
 
-		calculateSuitabilityScoreForPopulation(_populations.back());
+		calculateSuitabilityScoreForPopulation(_population);
 
-		selection(_populations.back());
+		selection(_population);
 
 		iteration_count++;
 	}
 
-	Population resultPopulation = _populations.back();
-
 	int bestNumber = 0;
-	float bestSuit = resultPopulation.getChromosomeAtIndex(0)->getSuitability();
-	for (unsigned int i = 0; i < resultPopulation.getSize(); i++) {
-		if (resultPopulation.getChromosomeAtIndex(i)->getSuitability() > bestSuit) {
+	float bestSuit = _population.getChromosomeAtIndex(0)->getSuitability();
+	for (unsigned int i = 0; i < _population.getSize(); i++) {
+		if (_population.getChromosomeAtIndex(i)->getSuitability() > bestSuit) {
 			bestNumber = i;
 		}
 	}
 	for (unsigned int i = 0; i < drones.size(); i++) {
-		results.push_back(Route(*resultPopulation.getChromosomeAtIndex(bestNumber), drones.at(i)));
+		results.push_back(Route(*_population.getChromosomeAtIndex(bestNumber), drones.at(i)));
 	}
 
 	return results;
@@ -81,13 +76,13 @@ void RouteManager::calculateSuitabilityScoreForPopulation(Population& population
 
 	for (unsigned int i = 0; i < population.getSize(); i++) {
 		Chromosome *chromosome = population.getChromosomeAtIndex(i);
-//		suitability_sum = 0;
+		suitability_sum = 0;
 
 		// Calculating suitability for first drone
 		drone = DataRepository::getInstance().getDroneAtIndex(0);
 		Route route = Route(*chromosome, *drone);
 		suitability = route.getRouteDistance() / drone->getDroneSpeed();
-//		suitability_sum += suitability;
+		suitability_sum += suitability;
 
 		//Calculating max suitability for chromosome. It will be total flight time.
 		max_suitability = suitability;
@@ -95,11 +90,11 @@ void RouteManager::calculateSuitabilityScoreForPopulation(Population& population
 			drone = DataRepository::getInstance().getDroneAtIndex(j);
 			Route route = Route(*chromosome, *drone);
 			suitability = route.getRouteDistance() / drone->getDroneSpeed();
-//			suitability_sum += suitability;
+			suitability_sum += suitability;
 			if (suitability > max_suitability)
 				max_suitability = suitability;
 		}
-		chromosome->setSuitability((10 / max_suitability));
+		chromosome->setSuitability((10 / max_suitability) + 1 / suitability_sum);
 	}
 }
 
@@ -138,26 +133,27 @@ void RouteManager::nextGeneration(Population& population) {
 		}
 		chanses[i + 1] = ((local_suitability * 100.0) / suitability_sum) + chanses[i];
 	}
+
 	chanses[population.getSize()] = 100; // max chance must be int and exactly 100
 
+//	std::cout << best_suitability << std::endl;
 	Chromosome best_chromosome = *population.getChromosomeAtIndex(best_index);
-	population.removeChromosomeAtIndex(best_index);
+//	population.removeChromosomeAtIndex(best_index);
 	int numberOfClones =
 			Constants::getPopulationCount() -
 			(Constants::getPopulationCount() *
 					((suitability_sum / (float)Constants::getPopulationCount())
 							/ best_suitability));
-
-	if (numberOfClones > (Constants::getPopulationCount() / 2)) {
-		numberOfClones = Constants::getPopulationCount() / 2;
+//
+	if (numberOfClones > (Constants::getPopulationCount() / 4)) {
+		numberOfClones = Constants::getPopulationCount() / 4;
 	}
 
 	// Generate family population.
 	Population familyPopulation = Population();
 	for (int i = 0; i < Constants::getPopulationCount() - numberOfClones; i++) {
 		int chance = rand() % 100 + 1;
-
-		for (unsigned int j = 0; j < population.getSize(); j++) {
+	for (int j = 0; j < population.getSize(); j++) {
 			if (chance > chanses[j] && chance <= chanses[j + 1]) {
 				familyPopulation.setChromosome(*population.getChromosomeAtIndex(j));
 				break;
@@ -169,10 +165,11 @@ void RouteManager::nextGeneration(Population& population) {
 
 	//clones
 
-	for (int i = nextPopulation.getSize(); i < Constants::getPopulationCount(); i++) {
+	for (int i = nextPopulation.getSize(); i <= Constants::getPopulationCount(); i++) {
 		nextPopulation.setChromosome(best_chromosome);
 	}
-	_populations.push_back(nextPopulation);
+
+	_population = nextPopulation;
 }
 
 // Crossing between parents.
@@ -186,27 +183,45 @@ Population RouteManager::crossing(Population& population) {
 		Chromosome chromosome2 = *population.getChromosomeAtIndex(randomNumber);
 		population.removeChromosomeAtIndex(randomNumber);
 
-		randomNumber = rand() % (chromosome1.getSize() - 1) + 1;
-
-		for (int i = 0; i < randomNumber; i++) {
-			Gene temp = *chromosome1.getGeneAtIndex(i);
-			chromosome1.ChangeGeneAtIndex(i, *chromosome2.getGeneAtIndex(i));
-			chromosome2.ChangeGeneAtIndex(i, temp);
+		int crossChance = rand() % 100;
+		if (crossChance > 0 && crossChance < 70) {
+			randomNumber = rand() % (chromosome1.getSize() - 1) + 1;
+			for (int i = 0; i < randomNumber; i++) {
+				Gene temp = *chromosome1.getGeneAtIndex(i);
+				chromosome1.ChangeGeneAtIndex(i, *chromosome2.getGeneAtIndex(i));
+				chromosome2.ChangeGeneAtIndex(i, temp);
+			}
 		}
 
-		int mutateChance = rand() % 100 + 1;
+		int mutateChance = rand() % 100;
 
 		if (mutateChance == 8) {
 			chromosome1.MutateGene();
-		}
-
-		if (mutateChance == 46) {
+			chromosome2.MutateGene();
 			chromosome1.MutateGene();
-		}
-
-		if (mutateChance == 16) {
 			chromosome2.MutateGene();
 		}
+
+//		if (mutateChance == 46) {
+//			chromosome1.MutateGene();
+//			chromosome2.MutateGene();
+//			chromosome1.MutateGene();
+//			chromosome2.MutateGene();
+//		}
+//
+//		if (mutateChance == 16) {
+//			chromosome2.MutateGene();
+//			chromosome1.MutateGene();
+//			chromosome1.MutateGene();
+//			chromosome2.MutateGene();
+//		}
+//
+//		if (mutateChance == 76) {
+//			chromosome2.MutateGene();
+//			chromosome1.MutateGene();
+//			chromosome1.MutateGene();
+//			chromosome2.MutateGene();
+//		}
 
 		nextPopulation.setChromosome(chromosome1);
 		nextPopulation.setChromosome(chromosome2);
