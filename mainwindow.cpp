@@ -12,6 +12,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+    pixmap = NULL;
     ui->setupUi(this);
 //    __drones = new QStandardItemModel(0, 4, this);
 
@@ -129,6 +130,7 @@ void MainWindow::on_pushButton_clicked()
     drFlag = true;
     this->update();
     pixmap = new QPixmap(300, 400);
+    pixmap->fill(Qt::black);
 
     ui->textBrowser->clear();
     QPainter qp(pixmap);
