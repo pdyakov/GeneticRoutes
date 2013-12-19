@@ -14,13 +14,14 @@
 class Chromosome {
 public:
 	Chromosome();
-	virtual ~Chromosome() { };
+    virtual ~Chromosome() { }
 
 	Gene* getGeneAtIndex(unsigned int index);
 
 	void AddGene(const Gene& gene);
 	void ChangeGeneAtIndex(unsigned int index, const Gene& replacementGene);
 	void MutateGene();
+    void MutateChromosome();
 	unsigned int getSize() const;
 	float getSuitability() const;
 

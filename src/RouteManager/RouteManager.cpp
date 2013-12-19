@@ -10,6 +10,7 @@
 #include "../DataAccess/Constants.h"
 #include <stdlib.h>
 #include <algorithm>
+#include <ctime>
 
 std::vector<Route> RouteManager::calculateBestRoutes(const std::vector<Target>& targets) {
 
@@ -27,7 +28,7 @@ std::vector<Route> RouteManager::calculateBestRoutes(const std::vector<Target>& 
 
 	int iteration_count = 0;
 	// start algorithm
-	while(iteration_count < 600) {
+    while(iteration_count < 600) {
 
 		nextGeneration(_population);
 
@@ -94,7 +95,7 @@ void RouteManager::calculateSuitabilityScoreForPopulation(Population& population
 			if (suitability > max_suitability)
 				max_suitability = suitability;
 		}
-		chromosome->setSuitability((10 / max_suitability) + 1 / suitability_sum);
+        chromosome->setSuitability((1 / max_suitability) + (1 / suitability_sum));
 	}
 }
 
@@ -118,7 +119,7 @@ bool RouteManager::routesResolved(Population& population) {
 // Calculate next population.
 void RouteManager::nextGeneration(Population& population) {
 	float suitability_sum = population.getSuitabilitySum();
-	float chanses[population.getSize() + 1];
+    std::vector<float> chanses(population.getSize() + 1);
 
 	// calculate chances to be a parent and find best one.
 	chanses[0] = 0;
@@ -136,7 +137,7 @@ void RouteManager::nextGeneration(Population& population) {
 
 	chanses[population.getSize()] = 100; // max chance must be int and exactly 100
 
-//	std::cout << best_suitability << std::endl;
+    std::cout << best_suitability << std::endl;
 	Chromosome best_chromosome = *population.getChromosomeAtIndex(best_index);
 //	population.removeChromosomeAtIndex(best_index);
 	int numberOfClones =
@@ -177,51 +178,49 @@ Population RouteManager::crossing(Population& population) {
 	Population nextPopulation = Population();
 	while (population.getSize() > 1) {
 		int randomNumber = rand() % population.getSize();
-		Chromosome chromosome1 = *population.getChromosomeAtIndex(randomNumber);
+        Chromosome chromosome1 = *population.getChromosomeAtIndex(randomNumber);
 		population.removeChromosomeAtIndex(randomNumber);
 		randomNumber = rand() % population.getSize();
-		Chromosome chromosome2 = *population.getChromosomeAtIndex(randomNumber);
+        Chromosome chromosome2 = *population.getChromosomeAtIndex(randomNumber);
 		population.removeChromosomeAtIndex(randomNumber);
 
 		int crossChance = rand() % 100;
 		if (crossChance > 0 && crossChance < 70) {
 			randomNumber = rand() % (chromosome1.getSize() - 1) + 1;
 			for (int i = 0; i < randomNumber; i++) {
-				Gene temp = *chromosome1.getGeneAtIndex(i);
-				chromosome1.ChangeGeneAtIndex(i, *chromosome2.getGeneAtIndex(i));
-				chromosome2.ChangeGeneAtIndex(i, temp);
+                Drone temp = *(chromosome1.getGeneAtIndex(i)->getDrone());
+                chromosome1.getGeneAtIndex(i)->setDrone(*(chromosome2.getGeneAtIndex(i)->getDrone()));
+                chromosome2.getGeneAtIndex(i)->setDrone(temp);
 			}
 		}
 
 		int mutateChance = rand() % 100;
-
-		if (mutateChance == 8) {
-			chromosome1.MutateGene();
-			chromosome2.MutateGene();
-			chromosome1.MutateGene();
-			chromosome2.MutateGene();
-		}
-
-//		if (mutateChance == 46) {
-//			chromosome1.MutateGene();
-//			chromosome2.MutateGene();
-//			chromosome1.MutateGene();
-//			chromosome2.MutateGene();
-//		}
 //
-//		if (mutateChance == 16) {
-//			chromosome2.MutateGene();
-//			chromosome1.MutateGene();
-//			chromosome1.MutateGene();
-//			chromosome2.MutateGene();
-//		}
-//
-//		if (mutateChance == 76) {
-//			chromosome2.MutateGene();
-//			chromosome1.MutateGene();
-//			chromosome1.MutateGene();
-//			chromosome2.MutateGene();
-//		}
+        if (mutateChance == 90) {
+            chromosome1.MutateGene();
+            chromosome2.MutateGene();
+        }
+
+        if (mutateChance > 10 && mutateChance < 20) {
+            chromosome1.MutateGene();
+            chromosome2.MutateGene();
+            chromosome1.MutateChromosome();
+            chromosome2.MutateChromosome();
+            chromosome1.MutateChromosome();
+            chromosome2.MutateChromosome();
+            chromosome1.MutateChromosome();
+            chromosome2.MutateChromosome();
+            chromosome1.MutateChromosome();
+            chromosome2.MutateChromosome();
+            chromosome1.MutateChromosome();
+            chromosome2.MutateChromosome();
+            chromosome1.MutateChromosome();
+            chromosome2.MutateChromosome();
+            chromosome1.MutateChromosome();
+            chromosome2.MutateChromosome();
+            chromosome1.MutateChromosome();
+            chromosome2.MutateChromosome();
+        }
 
 		nextPopulation.setChromosome(chromosome1);
 		nextPopulation.setChromosome(chromosome2);

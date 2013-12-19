@@ -14,9 +14,12 @@ Population::Population(std::vector<Target> targets, std::vector<Drone> drones) {
 	for (int i = 0; i < Constants::getPopulationCount(); i++) {
 		Chromosome chromosome = Chromosome();
 		for (int j = 0; j < targets.size(); j++) {
-			chromosome.AddGene(Gene(targets[j], drones[rand() % drones.size()]));
+            chromosome.AddGene(Gene(targets[j], drones[rand() % drones.size()]));
 		}
-		setChromosome(chromosome);
+        for (int t = 0; t < rand() % targets.size(); t++) {
+            chromosome.MutateChromosome();
+        }
+        setChromosome(chromosome);
 	}
 }
 

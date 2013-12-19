@@ -5,7 +5,7 @@
 
 BasesDialog::BasesDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::BasesDialog)
+    ui(new Ui::basesDialog)
 {
 
 

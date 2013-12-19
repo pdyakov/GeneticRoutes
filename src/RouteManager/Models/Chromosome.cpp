@@ -14,7 +14,8 @@ Chromosome::Chromosome() : _suitability(0) {
 }
 
 void Chromosome::AddGene(const Gene& gene) {
-	_genes.push_back(gene);
+   _genes.push_back(gene);
+
 }
 
 void Chromosome::ChangeGeneAtIndex(unsigned int index, const Gene& gene) {
@@ -26,6 +27,13 @@ void Chromosome::MutateGene() {
 	int gene_index = rand() % _genes.size();
 	int drone_index = rand() % DataRepository::getInstance().getDronesCount();
 	_genes[gene_index].setDrone(*DataRepository::getInstance().getDroneAtIndex(drone_index));
+}
+
+void Chromosome::MutateChromosome() {
+    int gene_index = rand() % _genes.size();
+    Gene gene = _genes[gene_index];
+    _genes.erase(_genes.begin() + gene_index);
+    _genes.push_back(gene);
 }
 
 Gene* Chromosome::getGeneAtIndex(unsigned int index) {

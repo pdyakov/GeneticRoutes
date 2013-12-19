@@ -6,7 +6,7 @@
 #include "src/DataAccess/DataRepository.h"
 
 namespace Ui {
-class TargetsDialog;
+class targetsDialog;
 }
 
 class TargetsDialog : public QDialog
@@ -26,7 +26,7 @@ private slots:
     void on_okButton_clicked();
 
 private:
-    Ui::TargetsDialog *ui;
+    Ui::targetsDialog *ui;
 
     QVector<Target> *__targets;
 

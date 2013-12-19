@@ -101,6 +101,7 @@ void MainWindow::on_action_6_triggered()
 
 void MainWindow::on_pushButton_clicked()
 {
+
     DataRepository::getInstance().clearAll();
     QMutableVectorIterator<FlightBase> baseIterator(*__flightBases);
     while(baseIterator.hasNext())
@@ -129,51 +130,51 @@ void MainWindow::on_pushButton_clicked()
     this->update();
     pixmap = new QPixmap(300, 400);
 
-
+    ui->textBrowser->clear();
     QPainter qp(pixmap);
     if (drFlag)
     {
         QPen pen(Qt::black, 2, Qt::SolidLine);
 
         QPolygon routes;
+        ui->textBrowser->clear();
         for(int i = 0; i < __routes->count(); i++)
         {
-            QString str = "Route - " + QString::number(i + 1);
-            ui->textBrowser->append(str);
-            if (i == 0)
-            {
-                pen.setColor(Qt::magenta);
-            }
-            if (i == 1)
-            {
-                pen.setColor(Qt::green);
-            }
-            if (i ==2 )
-            {
-                pen.setColor(Qt::red);
-            }
+            QString str = "Route for " + QString::number(i + 1) + " - ";
+
+            QString color;
+
             switch (i) {
             case 0:
                 pen.setColor(Qt::magenta);
-                break;
+                color = "Magenta";
+
+                        break;
             case 1:
                 pen.setColor(Qt::green);
+                color = "Green";
                 break;
             case 2:
                 pen.setColor(Qt::cyan);
+                color = "Cyan";
                 break;
             case 3:
                 pen.setColor(Qt::white);
+                color = "White";
                 break;
             case 4:
                 pen.setColor(Qt::darkYellow);
+                color = "DarkYellow";
                 break;
             case 5:
                 pen.setColor(Qt::gray);
+                color = "Gray";
                 break;
             default:
                 break;
             }
+            str.append(color);
+            ui->textBrowser->append(str);
 
             Route megaRoute = __routes->at(i);
             QVector<Coordinates> coords = QVector<Coordinates>::fromStdVector(megaRoute.getCoordinates());

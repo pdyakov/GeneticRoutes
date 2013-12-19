@@ -3,7 +3,7 @@
 
 DronesDialog::DronesDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::DronesDialog)
+    ui(new Ui::dronesDialog)
 {
     ui->setupUi(this);
     __dronesModel = new QStandardItemModel(0, 4, this);

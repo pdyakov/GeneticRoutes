@@ -8,7 +8,7 @@
 #include "Constants.h"
 
 int Constants::getPopulationCount() {
-    static int populationCount = 300;
+    static int populationCount = 200;
 	return populationCount;
 }
 

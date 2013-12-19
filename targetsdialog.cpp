@@ -3,7 +3,7 @@
 
 TargetsDialog::TargetsDialog(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::TargetsDialog)
+    ui(new Ui::targetsDialog)
 {
     ui->setupUi(this);
 
