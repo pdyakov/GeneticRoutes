@@ -55,3 +55,5 @@ FORMS    += mainwindow.ui \
     targetsdialog.ui \
     dronesdialog.ui \
     aboutdialog.ui
+
+QMAKE_LFLAGS += -static-libgcc

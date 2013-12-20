@@ -102,7 +102,6 @@ void MainWindow::on_action_6_triggered()
 
 void MainWindow::on_pushButton_clicked()
 {
-
     DataRepository::getInstance().clearAll();
     QMutableVectorIterator<FlightBase> baseIterator(*__flightBases);
     while(baseIterator.hasNext())
@@ -129,7 +128,7 @@ void MainWindow::on_pushButton_clicked()
    *__routes = QVector<Route>::fromStdVector(manager.calculateBestRoutes(DataRepository::getInstance().getTargets()));
     drFlag = true;
     this->update();
-    pixmap = new QPixmap(300, 400);
+    pixmap = new QPixmap(320, 400);
     pixmap->fill(Qt::black);
 
     ui->textBrowser->clear();
@@ -142,7 +141,8 @@ void MainWindow::on_pushButton_clicked()
         ui->textBrowser->clear();
         for(int i = 0; i < __routes->count(); i++)
         {
-            QString str = "Route for " + QString::number(i + 1) + " - ";
+            QString droneName = QString::fromStdString(__drones->at(i).getDroneName());
+            QString str = "Route for " + droneName + " with color ";
 
             QString color;
 
@@ -177,6 +177,8 @@ void MainWindow::on_pushButton_clicked()
             }
             str.append(color);
             ui->textBrowser->append(str);
+            QString coordsText = "x  -  y";
+            ui->textBrowser->append(coordsText);
 
             Route megaRoute = __routes->at(i);
             QVector<Coordinates> coords = QVector<Coordinates>::fromStdVector(megaRoute.getCoordinates());
